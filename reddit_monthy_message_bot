@@ -1,0 +1,44 @@
+import praw
+import schedule
+import time
+from datetime import datetime
+
+# Reddit API credentials
+client_id = 'your_client_id'
+client_secret = 'your_client_secret'
+user_agent = 'your_user_agent'
+username = 'your_username'
+password = 'your_password'
+
+# Initialize Reddit instance
+reddit = praw.Reddit(
+    client_id=client_id,
+    client_secret=client_secret,
+    user_agent=user_agent,
+    username=username,
+    password=password
+)
+
+# Function to send a message
+def send_message(recipient, subject, message):
+    try:
+        reddit.redditor(recipient).message(subject, message)
+        print(f"Message sent to {recipient} with subject '{subject}' and message '{message}'")
+    except Exception as e:
+        print(f"Failed to send message: {e}")
+
+def job():
+    today = datetime.now()
+    if today.day == 15: # Job to run on the 15th of every month
+        recipient = 'target_username'  # Set the target username
+        subject = 'Monthly Reminder'  # Set the subject
+        message = 'This is your monthly message!'  # Set the message content
+        send_message(recipient, subject, message)
+
+# Schedule the job every day at midnight
+schedule.every().day.at("00:00").do(job)
+
+# Run the scheduler
+while True:
+    schedule.run_pending()
+    time.sleep(1)
